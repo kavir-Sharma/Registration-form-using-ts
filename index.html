@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leo Club Registration</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <h1 class="main-heading">Join the Leo Club</h1>
+
+  <div class="container">
+    <form id="registerForm">
+      <div class="form-header">
+        <img src="Bhrikuti logo 1.png" alt="Leo Club Logo" class="club-logo" />
+        <h2>Leo Club of Kathmandu Bhrikuti</h2>
+      </div>
+
+      <select id="storageType">
+        <option value="local">Local Storage</option>
+        <option value="session">Session Storage</option>
+        <option value="cookie">Cookies</option>
+      </select>
+
+      <input type="text" name="fullName" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email Address" required />
+      <input type="date" name="dob" required />
+      <input type="tel" name="contactNumber" placeholder="Contact Number" required />
+      <select name="ageGroup" required>
+        <option value="">Select Age Group</option>
+        <option value="alpha">Alpha (12–18)</option>
+        <option value="omega">Omega (18–30)</option>
+      </select>
+      <input type="text" name="address" placeholder="Address" required />
+      <textarea name="reason" placeholder="Why do you want to join this club?" required></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <table id="dataTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Reg ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>DOB</th>
+          <th>Contact</th>
+          <th>Age Group</th>
+          <th>Address</th>
+          <th>Reason</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="customPopup" class="popup"></div>
+
+<script src="script.js"></script>
+  <script src="dist/script.js" type="module"></script>
+
+</body>
+</html>
