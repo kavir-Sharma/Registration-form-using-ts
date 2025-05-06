@@ -22,6 +22,7 @@ interface RegistrationData {
     let editIndex: number | null = null;
     let registrationIdCounter = parseInt(localStorage.getItem('leoRegIdCounter') || '660100', 10);
   
+    // Load data from storage based on the selected storage type.
     loadFromStorage();
   
     form.addEventListener('submit', (e: Event) => {
@@ -75,10 +76,13 @@ interface RegistrationData {
       loadFromStorage();
     });
   
+    // Function to load data from the selected storage type
     function loadFromStorage(): void {
-      renderTable(getStorageData());
+      const data = getStorageData();
+      renderTable(data);
     }
   
+    // Function to render the table with data
     function renderTable(data: RegistrationData[]): void {
       tbody.innerHTML = '';
   
@@ -103,68 +107,76 @@ interface RegistrationData {
             <button class="delete-btn action-btn">Delete</button>
           </td>
         `;
+        const editButton = row.querySelector('.edit-btn') as HTMLButtonElement;
+        const deleteButton = row.querySelector('.delete-btn') as HTMLButtonElement;
   
-        const editBtn = row.querySelector('.edit-btn') as HTMLButtonElement;
-        const deleteBtn = row.querySelector('.delete-btn') as HTMLButtonElement;
-  
-        editBtn.addEventListener('click', () => {
-          (form.elements.namedItem('fullName') as HTMLInputElement).value = entry.fullName;
-          (form.elements.namedItem('email') as HTMLInputElement).value = entry.email;
-          (form.elements.namedItem('dob') as HTMLInputElement).value = entry.dob;
-          (form.elements.namedItem('contactNumber') as HTMLInputElement).value = entry.contactNumber;
-          (form.elements.namedItem('ageGroup') as HTMLSelectElement).value = entry.ageGroup;
-          (form.elements.namedItem('address') as HTMLInputElement).value = entry.address;
-          (form.elements.namedItem('reason') as HTMLTextAreaElement).value = entry.reason;
+        editButton.addEventListener('click', () => {
+          const { fullName, email, dob, contactNumber, ageGroup, address, reason } = entry;
+          (form.elements.namedItem('fullName') as HTMLInputElement).value = fullName;
+          (form.elements.namedItem('email') as HTMLInputElement).value = email;
+          (form.elements.namedItem('dob') as HTMLInputElement).value = dob;
+          (form.elements.namedItem('contactNumber') as HTMLInputElement).value = contactNumber;
+          (form.elements.namedItem('ageGroup') as HTMLSelectElement).value = ageGroup;
+          (form.elements.namedItem('address') as HTMLInputElement).value = address;
+          (form.elements.namedItem('reason') as HTMLTextAreaElement).value = reason;
           editIndex = index;
-          submitButton.textContent = 'Save';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          submitButton.textContent = 'Update';
         });
   
-        deleteBtn.addEventListener('click', () => {
-          if (confirm('Delete this entry?')) {
+        deleteButton.addEventListener('click', () => {
+          if (confirm('Are you sure you want to delete this entry?')) {
             data.splice(index, 1);
             setStorageData(data);
             renderTable(data);
+            showPopup('Entry deleted successfully.');
           }
         });
   
         tbody.appendChild(row);
       });
   
-      table.style.display = 'table';
+      table.style.display = 'block';
     }
   
-    function getStorageData(): RegistrationData[] {
-      const type = storageSelector.value as StorageType;
-      if (type === 'local') return JSON.parse(localStorage.getItem('leoRegistrations') || '[]') as RegistrationData[];
-      if (type === 'session') return JSON.parse(sessionStorage.getItem('leoRegistrations') || '[]') as RegistrationData[];
-      if (type === 'cookie') return JSON.parse(getCookie('leoRegistrations') || '[]') as RegistrationData[];
-      return [];
-    }
-  
-    function setStorageData(data: RegistrationData[]): void {
-      const type = storageSelector.value as StorageType;
-      const str = JSON.stringify(data);
-      if (type === 'local') localStorage.setItem('leoRegistrations', str);
-      else if (type === 'session') sessionStorage.setItem('leoRegistrations', str);
-      else if (type === 'cookie') setCookie('leoRegistrations', str, 7);
-    }
-  
-    function setCookie(name: string, value: string, days: number): void {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-    }
-  
-    function getCookie(name: string): string {
-      return document.cookie.split('; ').reduce((r, v) => {
-        const parts = v.split('=');
-        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-      }, '');
-    }
-  
+    // Function to show a popup message
     function showPopup(message: string): void {
       popup.textContent = message;
       popup.style.display = 'block';
-      setTimeout(() => (popup.style.display = 'none'), 3000);
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 3000);
+    }
+  
+    // Function to get data from the selected storage type
+    function getStorageData(): RegistrationData[] {
+      const storageType = storageSelector.value as StorageType;
+      let data: RegistrationData[] = [];
+  
+      if (storageType === 'local') {
+        data = JSON.parse(localStorage.getItem('leoClubRegistrations') || '[]');
+      } else if (storageType === 'session') {
+        data = JSON.parse(sessionStorage.getItem('leoClubRegistrations') || '[]');
+      } else if (storageType === 'cookie') {
+        const cookieData = document.cookie.split(';').find(cookie => cookie.startsWith('leoClubRegistrations='));
+        if (cookieData) {
+          data = JSON.parse(decodeURIComponent(cookieData.split('=')[1]));
+        }
+      }
+  
+      return data;
+    }
+  
+    // Function to store data in the selected storage type
+    function setStorageData(data: RegistrationData[]): void {
+      const storageType = storageSelector.value as StorageType;
+  
+      if (storageType === 'local') {
+        localStorage.setItem('leoClubRegistrations', JSON.stringify(data));
+      } else if (storageType === 'session') {
+        sessionStorage.setItem('leoClubRegistrations', JSON.stringify(data));
+      } else if (storageType === 'cookie') {
+        document.cookie = `leoClubRegistrations=${encodeURIComponent(JSON.stringify(data))}; path=/`;
+      }
     }
   });
+  
